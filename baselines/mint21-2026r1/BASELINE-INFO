@@ -1,0 +1,7 @@
+tag=mint21
+mint_release=21
+mint_codename=vanessa
+mint_edition=MATE
+ubuntu_base=jammy
+kernel=5.15.0-41-generic
+captured=2026-10-23 19:48:26-07:00
