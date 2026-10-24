@@ -31,7 +31,9 @@ echo
 # Pure noise - differs on every install, never a finding.
 # NOTE: passwd/shadow/group are deliberately NOT filtered. They always
 # differ, and that difference is exactly what you are looking for.
-NOISE='machine-id|/hostname$|/hosts$|resolv\.conf|/fstab$|/mtab$|blkid\.tab|crypttab|ssh/ssh_host_|ssl/private/|lvm/(archive|backup)/|NetworkManager/system-connections/|netplan/|udev/rules\.d/70-persistent|/cups/|printcap|\.cache$|ld\.so\.cache'
+# shadow/gshadow are excluded from the snapshot (credentials), so they would
+# otherwise show as spurious "missing". Read them by hand - see checklist/2-users.md.
+NOISE='machine-id|/hostname$|/hosts$|resolv\.conf|/fstab$|/mtab$|blkid\.tab|crypttab|ssh/ssh_host_|ssl/private/|lvm/(archive|backup)/|NetworkManager/system-connections/|netplan/|udev/rules\.d/70-persistent|/cups/|printcap|\.cache$|ld\.so\.cache|^etc/shadow|^etc/gshadow|^shadow-?$|^gshadow-?$'
 
 # ------------------------------------------------------------------- etc
 echo "[*] Unpacking clean /etc ..."

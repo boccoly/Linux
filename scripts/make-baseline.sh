@@ -51,8 +51,14 @@ echo "Writing to   : $DEST"
 echo
 
 # ------------------------------------------------------------------- etc
-echo "[*] Snapshotting /etc ..."
-( cd / && zip -rqy "$DEST/etc.zip" etc )
+# Excludes credentials and private keys so the baseline is safe to publish.
+# Account comparison uses passwd.txt/group.txt below, which carry no hashes,
+# so nothing of value is lost.
+echo "[*] Snapshotting /etc (excluding shadow and private keys) ..."
+( cd / && zip -rqy "$DEST/etc.zip" etc \
+    -x 'etc/shadow' 'etc/shadow-' 'etc/gshadow' 'etc/gshadow-' \
+       'etc/ssh/ssh_host_*_key' 'etc/ssl/private/*' \
+       'etc/NetworkManager/system-connections/*' )
 echo "    etc.zip  $(du -h "$DEST/etc.zip" | cut -f1)"
 
 # ------------------------------------------------------------------- var
