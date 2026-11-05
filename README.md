@@ -1,4 +1,4 @@
-# Linux — CyberPatriot toolkit
+# Linux
 
 Built for Linux Mint 21 and Debian 12. Works on Ubuntu and most Debian derivatives.
 
