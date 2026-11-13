@@ -96,7 +96,7 @@ apt-mark showmanual 2>/dev/null | sort -u | cap manual-packages.txt "manually in
     fi
 } | cap added-packages.txt "added after install"
 
-BAD_PKGS='^(ophcrack|john|johnny|hydra|hashcat|medusa|aircrack-ng|ettercap-[a-z]+|nikto|sqlmap|metasploit[a-z-]*|wireshark|tshark|netcat[a-z-]*|ncat|nmap|nmapsi4|zenmap|telnetd|telnet-server|rsh-server|tftpd[a-z-]*|hping3|kismet|crack|cewl|dirb|wfuzz|responder|bettercap|vsftpd|minetest|freeciv|aisleriot|gnome-mahjongg|gnome-sudoku|gnome-mines|transmission[a-z-]*|deluge[a-z-]*|qbittorrent|frostwire|vuze|vnc4server|tightvncserver|x11vnc)$'
+BAD_PKGS='^(ophcrack|john|johnny|hydra|hashcat|medusa|aircrack-ng|ettercap-[a-z]+|nikto|sqlmap|metasploit[a-z-]*|wireshark|tshark|netcat[a-z-]*|ncat|nmap|nmapsi4|zenmap|telnetd|telnet-server|rsh-server|tftpd[a-z-]*|hping3|kismet|crack|cewl|dirb|wfuzz|responder|bettercap|vsftpd|minetest|freeciv|aisleriot|gnome-mahjongg|gnome-sudoku|gnome-mines|transmission[a-z-]*|deluge[a-z-]*|qbittorrent|frostwire|vuze|vnc4server|tightvncserver|x11vnc|snmpd|snmp|nagios[a-z-]*|nagios-nrpe-server|zabbix-agent[a-z0-9]*|puppet[a-z-]*|chef[a-z-]*|salt-minion|salt-master|ansible|munin-node|munin|collectd|landscape-client|cfengine[0-9]*|cacti|icinga[0-9a-z-]*|monit|net-snmp|firewalld|shorewall[6]*|iptables-persistent|nftables-persistent)$'
 mapfile -t FLAGGED < <(dpkg-query -W -f='${Package}\n' 2>/dev/null | grep -E "$BAD_PKGS" || true)
 {
     echo "### Prohibited / suspicious packages ###"
@@ -135,6 +135,20 @@ say "Network"
     echo; echo "=== hosts.deny ==="; cat /etc/hosts.deny 2>/dev/null
     echo; echo "=== resolv.conf ==="; cat /etc/resolv.conf 2>/dev/null
 } | cap firewall.txt "firewall and host access"
+
+{
+    echo "=== /etc/apt/sources.list ==="; grep -vE '^\s*#|^\s*$' /etc/apt/sources.list 2>/dev/null
+    echo; echo "=== /etc/apt/sources.list.d ==="
+    for f in /etc/apt/sources.list.d/*; do
+        [[ -f $f ]] || continue
+        echo "--- $f"; grep -vE '^\s*#|^\s*$' "$f"
+    done
+    echo; echo "=== Mint deb822 (if present) ==="
+    cat /etc/apt/sources.list.d/official-package-repositories.list 2>/dev/null
+    echo; echo "=== pinning ==="; cat /etc/apt/preferences 2>/dev/null; ls -la /etc/apt/preferences.d/ 2>/dev/null
+    echo; echo "=== third-party keys ==="; ls -la /etc/apt/trusted.gpg.d/ /etc/apt/keyrings/ 2>/dev/null
+    echo; echo "=== upgradable ==="; apt list --upgradable 2>/dev/null | head -40
+} | cap apt-sources.txt "repos, pinning, pending updates"
 
 # ----------------------------------------------------------- persistence
 say "Persistence"
